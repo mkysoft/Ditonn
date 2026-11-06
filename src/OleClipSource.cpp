@@ -9,7 +9,7 @@
 #include "htmlformataggregator.h"
 #include "..\Shared\Tokenizer.h"
 #include <random>
-#include "Client.h"
+#include "CF_HDropBuilder.h"
 #include "Path.h"
 #include "Md5.h"
 #include "DittoChaiScript.h"
@@ -1098,7 +1098,7 @@ void COleClipSource::ApplyDriveReplacements(
 
 void COleClipSource::SaveDittoFileDataToFile(CClip &clip)
 {
-	CFileRecieve hDrpData;
+	CCF_HDropBuilder hDrpData;
 	CClipFormat* pCF;
 	int hDropIndex = -1;
 	bool savedFile = false;
@@ -1265,7 +1265,6 @@ INT_PTR COleClipSource::PutFormatOnClipboard(CClipFormats *pFormats)
 
 	CClipFormat* pCF;
 	INT_PTR	count = pFormats->GetSize();
-	bool bDelayedRenderCF_HDROP = false;
 	bool dittoFileData = false;
 	INT_PTR i = 0;
 
@@ -1274,11 +1273,6 @@ INT_PTR COleClipSource::PutFormatOnClipboard(CClipFormats *pFormats)
 	for(i = 0; i < count; i++)
 	{
 		pCF = &pFormats->ElementAt(i);
-
-		if(pCF->m_cfType == theApp.m_RemoteCF_HDROP)
-		{
-			bDelayedRenderCF_HDROP = true;
-		}
 
 		if (pCF->m_cfType == theApp.m_DittoFileData)
 		{
@@ -1292,17 +1286,6 @@ INT_PTR COleClipSource::PutFormatOnClipboard(CClipFormats *pFormats)
 	for(i = 0; i < count; i++)
 	{
 		pCF = &pFormats->ElementAt(i);
-
-		if(bDelayedRenderCF_HDROP)
-		{
-			if(pCF->m_cfType == CF_HDROP)
-			{
-				LogSendRecieveInfo("Added delayed cf_hdrop to clipboard");
-				DelayRenderData(pCF->m_cfType);
-			}
-
-			continue;
-		}
 
 		Log(StrF(_T("Setting clipboard type: %s to the clipboard"), GetFormatName(pCF->m_cfType)));
 
@@ -1349,56 +1332,19 @@ BOOL COleClipSource::OnRenderGlobalData(LPFORMATETC lpFormatEtc, HGLOBAL* phGlob
 			return false;
 		}
 
-		LogSendRecieveInfo("Delayed Render, getting data from remote machine");
-
 		CClip clip;
 
 		if(m_ClipIDs.GetCount() > 0)
 		{
 			clip.LoadFormats(m_ClipIDs[0]);
 
-			CClipFormat *pDittoDelayCF_HDROP = clip.m_Formats.FindFormat(theApp.m_RemoteCF_HDROP);
-			CClipFormat *pCF_HDROP = clip.m_Formats.FindFormat(CF_HDROP);
+			hData = m_ClipIDs.Render(lpFormatEtc->cfFormat);
 
-			if(pDittoDelayCF_HDROP && pCF_HDROP)
+			if (m_convertToHDROPOnDelayRender &&
+				hData == NULL &&
+				lpFormatEtc->cfFormat == CF_HDROP)
 			{
-				CDittoCF_HDROP *pData = (CDittoCF_HDROP*)GlobalLock(pDittoDelayCF_HDROP->m_hgData);
-				if(pData)
-				{
-					CString csComputerName;
-					CString csIP;
-
-					csIP = CTextConvert::Utf8ToUnicode(pData->m_cIP);
-					csComputerName = CTextConvert::Utf8ToUnicode(pData->m_cComputerName);
-
-					GlobalUnlock(pDittoDelayCF_HDROP->m_hgData);
-
-					CString ipPort = csIP;
-					if (pData->respondPort > 0)
-					{
-						ipPort.Format(_T("%s:%d"), csIP, pData->respondPort);
-					}
-
-					CString namePort = csComputerName;
-					if (pData->respondPort > 0)
-					{
-						namePort.Format(_T("%s:%d"), csComputerName, pData->respondPort);
-					}
-
-					CClient cl;
-					hData = cl.RequestCopiedFiles(*pCF_HDROP, ipPort, namePort);
-				}
-			}
-				else
-			{
-				hData = m_ClipIDs.Render(lpFormatEtc->cfFormat);
-
-				if (m_convertToHDROPOnDelayRender &&
-					hData == NULL &&
-					lpFormatEtc->cfFormat == CF_HDROP)
-				{
-					hData = ConvertToFileDrop();
-				}
+				hData = ConvertToFileDrop();
 			}
 		}
 
@@ -1447,7 +1393,7 @@ HGLOBAL COleClipSource::ConvertToFileDrop()
 	CString path = CGetSetOptions::GetPath(PATH_DRAG_FILES);
 	CreateDirectory(path, NULL);
 
-	CFileRecieve fileList;
+	CCF_HDropBuilder fileList;
 
 	int dragId = CGetSetOptions::GetDragId();
 	int origDragId = dragId;

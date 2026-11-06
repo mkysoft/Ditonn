@@ -1,6 +1,6 @@
 #pragma once
 #include "IClipAggregator.h"
-#include "FileRecieve.h"
+#include "CF_HDropBuilder.h"
 
 class CCF_HDropAggregator : public IClipAggregator
 {
@@ -13,5 +13,5 @@ public:
 	virtual HGLOBAL GetHGlobalAsString();
 
 protected:
-	CFileRecieve m_DropFiles;
+	CCF_HDropBuilder m_DropFiles;
 };

@@ -17,10 +17,6 @@
 #define UPDATE_AFTER_PASTE_SELECT_CLIP 0x1
 #define UPDATE_CLIP_DESCRIPTION 0x2
 
-#define REMOTE_CLIP_ADD_TO_CLIPBOARD 0x1
-#define REMOTE_CLIP_MANUAL_SEND 0x2
-
-
 //Handle foreign keyboards pressing ALT_GR (right alt), this simulates a control press
 //http://compgroups.net/comp.os.programmer.win32/alt-gr-key-and-left-ctrl/2840252
 #define CONTROL_PRESSED ((::GetKeyState(VK_CONTROL) & 0x8000) && (((GetKeyState(VK_RMENU) < 0) && (GetKeyState(VK_LCONTROL) < 0)) == FALSE))
@@ -78,14 +74,11 @@ CString GetComputerName();
 #define FUNC		__FUNCTION__
 #define FUNCSIG		__FUNCSIG__
 void AppendToFile(const TCHAR* fn, const TCHAR *msg);
-#define Log(msg) log(msg, false, __FILE__, __LINE__)
-void log(const TCHAR* msg, bool bFromSendRecieve = false, CString csFile = _T(""), long lLine = -1);
+#define Log(msg) log(msg, __FILE__, __LINE__)
+void log(const TCHAR* msg, CString csFile = _T(""), long lLine = -1);
 CString GetErrorString(int err);
 
 double IdleSeconds();
-
-#define LogSendRecieveInfo(cs) logsendrecieveinfo(cs, __FILE__, __LINE__);
-void logsendrecieveinfo(CString cs, CString csFile = _T(""), long lLine = -1);
 
 // Utility Functions
 CString StrF(const TCHAR * pszFormat, ...);
@@ -139,8 +132,6 @@ __int64 GetLastWriteTime(const CString &csFile);
 #define WM_CLOSE_APP			WM_USER + 204
 #define WM_REFRESH_VIEW			WM_USER + 205
 #define WM_CLIPBOARD_COPIED		WM_USER + 206
-#define WM_ADD_TO_DATABASE_FROM_SOCKET		WM_USER + 207
-#define WM_SEND_RECIEVE_ERROR	WM_USER + 208
 #define WM_FOCUS_CHANGED		WM_USER + 209
 #define WM_CV_GETCONNECT		WM_USER + 211
 #define WM_EDIT_WND_CLOSING		WM_USER	+ 212

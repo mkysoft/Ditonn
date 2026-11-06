@@ -289,7 +289,7 @@ DittoSetup*]]></ExclExt>
 			<Text><![CDATA[[[Files]]
 ".\appxmanifest.xml"    "AppxManifest.xml"
 
-".\Ditto\Ditto.exe"     "Ditto.exe"
+".\Ditto\Ditonn.exe"     "Ditonn.exe"
 
 ".\Ditto\ICU_Loader.dll"     "ICU_Loader.dll"
 
@@ -369,7 +369,7 @@ DittoSetup*]]></ExclExt>
     <rescap:Capability Name="runFullTrust"/>
   </Capabilities>
   <Applications>
-    <Application Id="Ditto" Executable="Ditto.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="Ditto" Executable="Ditonn.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
        BackgroundColor="#ffffff"
        DisplayName="Ditto"
@@ -378,16 +378,10 @@ DittoSetup*]]></ExclExt>
        Description="Ditto" />
        
        <Extensions>
-			<desktop:Extension Category="windows.startupTask" Executable="Ditto.exe" EntryPoint="Windows.FullTrustApplication">
+      <desktop:Extension Category="windows.startupTask" Executable="Ditonn.exe" EntryPoint="Windows.FullTrustApplication">
 				<desktop:StartupTask TaskId="DittoStartupTask" Enabled="true" DisplayName="Ditto Service" />
 			</desktop:Extension>
 			
-			<desktop2:Extension Category="windows.firewallRules">  
-     			<desktop2:FirewallRules Executable="Ditto.exe">  
-          			<desktop2:Rule Direction="in" IPProtocol="TCP" LocalPortMin="23443" LocalPortMax="23443" RemotePortMin="23443" RemotePortMax="23443" Profile="domainAndPrivate"/>   
-          			<desktop2:Rule Direction="out" IPProtocol="TCP" LocalPortMin="23443" LocalPortMax="23443" RemotePortMin="23443" RemotePortMax="23443" Profile="domainAndPrivate"/>   
-      			</desktop2:FirewallRules>  
-  			</desktop2:Extension>
 			
 
 			<uap:Extension Category="windows.fileTypeAssociation">
@@ -2883,9 +2877,9 @@ DittoPortable_%versionFileName%.zip]]></Ext>
 		</step>
 		<step action='Run Program'>
 			<checked type='11'>0</checked>
-			<command>"c:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe" sign /f "C:\Users\sab.000\Desktop\Ditto_Cert\Ditto.pfx" /p Hastings /t http://timestamp.comodoca.com/authenticode %workDir%\%branch%\Release64\Ditto.exe</command>
+      <command>"c:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe" sign /f "C:\Users\sab.000\Desktop\Ditto_Cert\Ditto.pfx" /p Hastings /t http://timestamp.comodoca.com/authenticode %workDir%\%branch%\Release64\Ditonn.exe</command>
 			<indent type='3'>1</indent>
-			<name>Sign Ditto.exe 64</name>
+      <name>Sign Ditonn.exe 64</name>
 			<outputfrom type='3'>1</outputfrom>
 		</step>
 		<step action='Run Program'>
@@ -2897,9 +2891,9 @@ DittoPortable_%versionFileName%.zip]]></Ext>
 		</step>
 		<step action='Run Program'>
 			<checked type='11'>0</checked>
-			<command>"c:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe" sign /f "C:\Users\sab.000\Desktop\Ditto_Cert\Ditto.pfx" /p Hastings /t http://timestamp.comodoca.com/authenticode %workDir%\%branch%\Release\Ditto.exe</command>
+      <command>"c:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe" sign /f "C:\Users\sab.000\Desktop\Ditto_Cert\Ditto.pfx" /p Hastings /t http://timestamp.comodoca.com/authenticode %workDir%\%branch%\Release\Ditonn.exe</command>
 			<indent type='3'>1</indent>
-			<name>Sign Ditto.exe</name>
+      <name>Sign Ditonn.exe</name>
 			<outputfrom type='3'>1</outputfrom>
 		</step>
 		<step action='Run Program'>

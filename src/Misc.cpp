@@ -72,7 +72,7 @@ void AppendToFile(const TCHAR* fn, const TCHAR* msg)
 	}
 }
 
-void log(const TCHAR* msg, bool bFromSendRecieve, CString csFile, long lLine)
+void log(const TCHAR* msg, CString csFile, long lLine)
 {
 	ASSERT(AfxIsValidString(msg));
 
@@ -98,23 +98,14 @@ void log(const TCHAR* msg, bool bFromSendRecieve, CString csFile, long lLine)
 	}
 
 #ifndef _DEBUG
-	if(!bFromSendRecieve)
-	{
-		if(!CGetSetOptions::m_bEnableDebugLogging)
-			return;
-	}
+	if(!CGetSetOptions::m_bEnableDebugLogging)
+		return;
 #endif
 	
 	CString csExeFile = CGetSetOptions::GetPath(PATH_LOG_FILE);
 	csExeFile += "Ditto.log";
 
 	AppendToFile(csExeFile, csText);
-}
-
-void logsendrecieveinfo(CString cs, CString csFile, long lLine)
-{
-	if(CGetSetOptions::m_bLogSendReceiveErrors)
-		log(cs, true, csFile, lLine);
 }
 
 CString GetErrorString( int err )
@@ -1119,13 +1110,7 @@ bool IsRunningLimited()
 
 void DeleteDittoTempFiles(BOOL checkFileLastAccess)
 {
-	CString csDir = CGetSetOptions::GetPath(PATH_REMOTE_FILES);
-	if (FileExists(csDir))
-	{
-		DeleteFolderFiles(csDir, checkFileLastAccess, CTimeSpan(0, 1, 0, 0));
-	}
-
-	csDir = CGetSetOptions::GetPath(PATH_DRAG_FILES);
+	CString csDir = CGetSetOptions::GetPath(PATH_DRAG_FILES);
 	if (FileExists(csDir))
 	{
 		DeleteFolderFiles(csDir, checkFileLastAccess, CTimeSpan(0, 1, 0, 0));
@@ -1140,7 +1125,7 @@ void DeleteDittoTempFiles(BOOL checkFileLastAccess)
 
 void DeleteFolderFiles(CString csDir, BOOL checkFileLastAccess, CTimeSpan lastAccessOffset)
 {
-	if (csDir.Find(_T("\\ReceivedFiles\\")) == -1 && csDir.Find(_T("\\DragFiles\\")) == -1 && csDir.Find(_T("ClipCompare")) == -1 && csDir.Find(_T("EditClips")) == -1)
+	if (csDir.Find(_T("\\DragFiles\\")) == -1 && csDir.Find(_T("ClipCompare")) == -1 && csDir.Find(_T("EditClips")) == -1)
 		return;
 
 	Log(StrF(_T("Deleting files in Folder %s Check Last Access %d"), csDir, checkFileLastAccess));

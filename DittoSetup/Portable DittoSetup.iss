@@ -50,7 +50,7 @@ Name: Romanian; MessagesFile: Romanian.isl
 Name: Swedish; MessagesFile: Swedish.isl
 
 [Files]
-Source: "..\Release\DittoU.exe"; DestDir: "{app}"; DestName: "Ditto.exe"; Flags: ignoreversion;
+Source: "..\Release\Ditonn.exe"; DestDir: "{app}"; DestName: "Ditonn.exe"; Flags: ignoreversion;
 
 Source: "..\Release\focus.dll"; DestDir: "{app}"; BeforeInstall: BeforeFocusInstall(); Flags: ignoreversion restartreplace
 Source: "..\Release\sqlite3.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -70,7 +70,7 @@ Source: "Ditto.Settings"; DestDir: "{app}"; Flags: onlyifdoesntexist
 Source: "..\Help\*.htm"; DestDir: "{app}\Help"; Flags: ignoreversion
 
 [Run]
-Filename: "{app}\Ditto.exe"; Description: "Launch Ditto"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Ditonn.exe"; Description: "Launch Ditto"; Flags: nowait postinstall skipifsilent
 Filename: "{app}\Help\DittoGettingStarted.htm"; Description: "View Help"; Flags: nowait postinstall skipifsilent shellexec
 Filename: "{app}\Changes.txt"; Description: "View Change History"; Flags: nowait postinstall skipifsilent shellexec unchecked
 

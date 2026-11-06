@@ -1,5 +1,5 @@
 #define MyAppName "Ditto"
-#define MyAppVersion GetFileVersion("..\ARM64\Release\Ditto.exe")
+#define MyAppVersion GetFileVersion("..\ARM64\Release\Ditonn.exe")
 #define MyAppVerName MyAppName + " " + MyAppVersion
 
 #define bit64
@@ -67,11 +67,10 @@ Name: Swedish; MessagesFile: Swedish.isl
 
 [Tasks]
 Name: RunAtStartup; Description: Run Ditto on windows startup
-Name: AddFireWallException; Description: Add Windows Firewall exception for Ditto on port 23443;  Flags: unchecked
 
 [Files]
 #ifdef bit64
-  Source: ..\ARM64\Release\Ditto.exe; DestDir: {app}; DestName: Ditto.exe; Check: InstallARM64; Flags: ignoreversion; AfterInstall: AddProgramToFirewall(ExpandConstant('{app}\Ditto.exe'), 'Ditto_FromInstaller_64');
+  Source: ..\ARM64\Release\Ditonn.exe; DestDir: {app}; DestName: Ditonn.exe; Check: InstallARM64; Flags: ignoreversion
   Source: ..\ARM64\Release\ICU_Loader.dll; DestDir: {app}; Check: InstallARM64; Flags: ignoreversion
   Source: ..\ARM64\Release\Addins\DittoUtil.dll; DestDir: {app}\Addins; Check: InstallARM64; Flags: ignoreversion
 
@@ -83,7 +82,7 @@ Name: AddFireWallException; Description: Add Windows Firewall exception for Ditt
   Source: C:\Windows\sysnative\mfc140u.dll;  DestDir: {app}; Flags: ignoreversion
 #endif
 #ifndef bit64
-  ; Source: ..\Release\Ditto.exe; DestDir: {app}; DestName: Ditto.exe; Flags: ignoreversion; AfterInstall: AddProgramToFirewall(ExpandConstant('{app}\Ditto.exe'), 'Ditto_FromInstaller_32');
+  ; Source: ..\Release\Ditonn.exe; DestDir: {app}; DestName: Ditonn.exe; Flags: ignoreversion
   ; Source: ..\Release\ICU_Loader.dll; DestDir: {app}; Flags: ignoreversion
   ; Source: ..\Release\Addins\DittoUtil.dll; DestDir: {app}\Addins; Flags: ignoreversion
 
@@ -96,17 +95,17 @@ Source: ..\Debug\Language\*; DestDir: {app}\Language; BeforeInstall: BeforeLangu
 Source: ..\Debug\Themes\*; DestDir: {app}\Themes
 
 [Icons]
-Name: {group}\Ditto; Filename: {app}\Ditto.exe
+Name: {group}\Ditto; Filename: {app}\Ditonn.exe
 Name: {group}\Uninstall; Filename: {uninstallexe}
 
 [Run]
-Filename: {app}\Ditto.exe; Description: Launch Ditto; Flags: nowait postinstall
+Filename: {app}\Ditonn.exe; Description: Launch Ditto; Flags: nowait postinstall
 Filename: https://sourceforge.net/p/ditto-cp/wiki/Getting%20Started; Description: View Help; Flags: nowait postinstall skipifsilent shellexec unchecked
 Filename: https://ditto-cp.sourceforge.io/changeHistory.php; Description: View Change History; Flags: nowait postinstall skipifsilent shellexec unchecked
 
 [Registry]
 Root: HKCU; Subkey: Software\Ditto; Flags: uninsdeletekey
-Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Ditto; flags: uninsdeletevalue; ValueData: {app}\Ditto.exe; Tasks: RunAtStartup
+Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Ditto; flags: uninsdeletevalue; ValueData: {app}\Ditonn.exe; Tasks: RunAtStartup
 
 Root: HKCU; Subkey: Software\Ditto; ValueType: dword; ValueName: SetFocus_iexplore.exe; ValueData: 00000001
 
@@ -125,8 +124,8 @@ Root: HKCU; Subkey: Software\Ditto\CopyStrings; ValueName: cmd.exe; MinVersion: 
 ;associate .dto with Ditto
 Root: HKCR; Subkey: .dto; ValueType: string; ValueName: ; ValueData: Ditto; Flags: uninsdeletevalue
 Root: HKCR; Subkey: Ditto; ValueType: string; ValueName: ; ValueData: Ditto; Flags: uninsdeletekey
-Root: HKCR; Subkey: Ditto\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Ditto.exe,0
-Root: HKCR; Subkey: Ditto\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\Ditto.exe"" ""%1"""
+Root: HKCR; Subkey: Ditto\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Ditonn.exe,0
+Root: HKCR; Subkey: Ditto\shell\open\command; ValueName: ; ValueData: """{app}\Ditonn.exe"" ""%1"""
 
 
 [Code]
@@ -281,46 +280,6 @@ begin
   end;
 end;
 
-
-function RuleExistsInFirewall(RuleName : String) : Boolean;
-var
-  ErrorCode : Integer;
-begin
-  Exec('>', 'netsh advfirewall firewall show rule name="' + RuleName + '"', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-  if ErrorCode = 0 then
-    Result := True
-  else
-    Result := False;
-end;
-
-procedure AddProgramToFirewall(ProgramName : String; RuleName : String);
-var
-  ErrorCode : Integer;
-  Success : Boolean;
-  WindowsVersion : TWindowsVersion;
-begin
-  if IsTaskSelected('AddFireWallException') then
-    begin
-    GetWindowsVersionEx(WindowsVersion);
-    if (WindowsVersion.Major < 6) then
-      begin
-        Success := Exec('>', 'netsh firewall add allowedprogram "' + ProgramName + '" "' + RuleName + '" ENABLE ALL', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-      end
-    else
-      begin
-        if (not RuleExistsInFirewall(RuleName)) then
-          begin
-            Success := Exec('>', 'netsh advfirewall firewall add rule name="' + RuleName + '" dir=in action=allow protocol=TCP localport=23443 program="' + ProgramName + '" enable=yes', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-            Success := Exec('>', 'netsh advfirewall firewall add rule name="' + RuleName + '" dir=out action=allow protocol=TCP localport=23443 program="' + ProgramName + '" enable=yes', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-          end
-      end;
-     
-    if not Success then
-       Log('Error - Unable to add ' + RuleName + ' to List of Windows firewall exceptions. ErrorCode: ' + IntToStr(ErrorCode))
-    else
-       Log(RuleName + ' successfully added to list of Windows firewall exceptions. ErrorCode: ' + IntToStr(ErrorCode))
-  end
-end;
 
 function InstallARM64: Boolean;
 begin

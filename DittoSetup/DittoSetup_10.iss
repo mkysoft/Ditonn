@@ -1,5 +1,5 @@
 #define MyAppName               "Ditto"
-#define MyAppVersion            GetFileVersion("..\Release64\Ditto.exe")
+#define MyAppVersion            GetFileVersion("..\Release64\Ditonn.exe")
 #define MyAppVerName            MyAppName + " " + MyAppVersion
 #define MyAppPublisher          "Scott Brogden"
 #define MyAppSupportURL         "ditto-cp.sourceforge.net"
@@ -19,7 +19,7 @@ AppUpdatesURL={#MyAppSupportURL}
 
 WizardStyle=modern
 
-UninstallDisplayIcon={app}\Ditto.exe
+UninstallDisplayIcon={app}\Ditonn.exe
 UninstallDisplayName={#MyAppName}
 
 VersionInfoDescription={#MyAppName} installer
@@ -79,7 +79,6 @@ Name: Swedish;             MessagesFile: Swedish.isl
 
 [CustomMessages]
 English.RunDittoOnStartup=Run Ditto on Windows startup
-English.AddFirewallException=Add Windows Firewall exception for Ditto on port 23443
 English.LaunchDitto=Launch Ditto
 English.ViewHelp=View Help
 English.ViewChangeHistory=View Change History
@@ -87,7 +86,6 @@ English.UninstallDitto=Uninstall Ditto
 English.VCRuntimeInstallFailed=VCRuntime prerequisite install failed.
 
 Italiano.RunDittoOnStartup=Esegui Ditto all'avvio di Windows
-Italiano.AddFirewallException=Aggiungi eccezione a Windows Firewall per Ditto e la porta 23443
 Italiano.LaunchDitto=Esegui Ditto
 Italiano.ViewHelp=Visualizza guida in linea
 Italiano.ViewChangeHistory=Visualizza cronologia versioni programma
@@ -96,10 +94,9 @@ Italiano.VCRuntimeInstallFailed=Installazione prerequisito VCRuntime non riuscit
 
 [Tasks]
 Name: RunAtStartup; Description: {cm:RunDittoOnStartup}
-Name: AddFireWallException; Description: {cm:AddFirewallException};  Flags: unchecked
 
 [Files]
-Source: ..\Release64\Ditto.exe; DestDir: {app}; DestName: Ditto.exe; Flags: ignoreversion; AfterInstall: AddProgramToFirewall(ExpandConstant('{app}\Ditto.exe'), 'Ditto_FromInstaller_64');
+Source: ..\Release64\Ditonn.exe; DestDir: {app}; DestName: Ditonn.exe; Flags: ignoreversion
 Source: ..\Release64\ICU_Loader.dll; DestDir: {app}; Flags: ignoreversion
 Source: ..\Release64\Addins\DittoUtil.dll; DestDir: {app}\Addins; Flags: ignoreversion
 
@@ -115,17 +112,17 @@ Source: ..\Debug\Language\*; DestDir: {app}\Language; BeforeInstall: BeforeLangu
 Source: ..\Debug\Themes\*; DestDir: {app}\Themes
 
 [Icons]
-Name: {group}\Ditto; Filename: {app}\Ditto.exe
+Name: {group}\Ditto; Filename: {app}\Ditonn.exe
 Name: {group}\{cm:UninstallDitto}; Filename: {uninstallexe}
 
 [Run]
-Filename: {app}\Ditto.exe; Description: {cm:LaunchDitto}; Flags: nowait postinstall
+Filename: {app}\Ditonn.exe; Description: {cm:LaunchDitto}; Flags: nowait postinstall
 Filename: https://github.com/sabrogden/Ditto/wiki; Description: {cm:ViewHelp}; Flags: nowait postinstall skipifsilent shellexec unchecked
 Filename: https://github.com/sabrogden/Ditto/releases; Description: {cm:ViewChangeHistory}; Flags: nowait postinstall skipifsilent shellexec unchecked
 
 [Registry]
 Root: HKCU; Subkey: Software\Ditto; Flags: uninsdeletekey
-Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Ditto; flags: uninsdeletevalue; ValueData: {app}\Ditto.exe; Tasks: RunAtStartup
+Root: HKCU; Subkey: SOFTWARE\Microsoft\Windows\CurrentVersion\Run; ValueType: string; ValueName: Ditto; flags: uninsdeletevalue; ValueData: {app}\Ditonn.exe; Tasks: RunAtStartup
 
 Root: HKCU; Subkey: Software\Ditto; ValueType: dword; ValueName: SetFocus_iexplore.exe; ValueData: 00000001
 
@@ -144,8 +141,8 @@ Root: HKCU; Subkey: Software\Ditto\CopyStrings; ValueName: cmd.exe; MinVersion: 
 ;associate .dto with Ditto
 Root: HKCR; Subkey: .dto; ValueType: string; ValueName: ; ValueData: Ditto; Flags: uninsdeletevalue
 Root: HKCR; Subkey: Ditto; ValueType: string; ValueName: ; ValueData: Ditto; Flags: uninsdeletekey
-Root: HKCR; Subkey: Ditto\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Ditto.exe,0
-Root: HKCR; Subkey: Ditto\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\Ditto.exe"" ""%1"""
+Root: HKCR; Subkey: Ditto\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Ditonn.exe,0
+Root: HKCR; Subkey: Ditto\shell\open\command; ValueType: string; ValueName: ; ValueData: """{app}\Ditonn.exe"" ""%1"""
 
 
 [Code]
@@ -287,43 +284,4 @@ begin
 end;
 
 
-function RuleExistsInFirewall(RuleName : String) : Boolean;
-var
-  ErrorCode : Integer;
-begin
-  Exec('>', 'netsh advfirewall firewall show rule name="' + RuleName + '"', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-  if ErrorCode = 0 then
-    Result := True
-  else
-    Result := False;
-end;
-
-procedure AddProgramToFirewall(ProgramName : String; RuleName : String);
-var
-  ErrorCode : Integer;
-  Success : Boolean;
-  WindowsVersion : TWindowsVersion;
-begin
-  if IsTaskSelected('AddFireWallException') then
-    begin
-    GetWindowsVersionEx(WindowsVersion);
-    if (WindowsVersion.Major < 6) then
-      begin
-        Success := Exec('>', 'netsh firewall add allowedprogram "' + ProgramName + '" "' + RuleName + '" ENABLE ALL', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-      end
-    else
-      begin
-        if (not RuleExistsInFirewall(RuleName)) then
-          begin
-            Success := Exec('>', 'netsh advfirewall firewall add rule name="' + RuleName + '" dir=in action=allow protocol=TCP localport=23443 program="' + ProgramName + '" enable=yes', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-            Success := Exec('>', 'netsh advfirewall firewall add rule name="' + RuleName + '" dir=out action=allow protocol=TCP localport=23443 program="' + ProgramName + '" enable=yes', '', SW_HIDE, ewWaitUntilTerminated, ErrorCode);
-          end
-      end;
-     
-    if not Success then
-       Log('Error - Unable to add ' + RuleName + ' to List of Windows firewall exceptions. ErrorCode: ' + IntToStr(ErrorCode))
-    else
-       Log(RuleName + ' successfully added to list of Windows firewall exceptions. ErrorCode: ' + IntToStr(ErrorCode))
-  end
-end;
 

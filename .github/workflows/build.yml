@@ -40,7 +40,7 @@ jobs:
         
       - name: Set Versions
         run: |
-            DittoSetup\rcedit-x64 Release64\Ditto.exe --set-file-version ${{env.VERSION_DOT_FILENAME}} --set-product-version ${{env.VERSION_DOT_FILENAME}}
+            DittoSetup\rcedit-x64 Release64\Ditonn.exe --set-file-version ${{env.VERSION_DOT_FILENAME}} --set-product-version ${{env.VERSION_DOT_FILENAME}}
 
       - name: upload-unsigned-exe
         id: upload-unsigned-exe
@@ -49,7 +49,7 @@ jobs:
           name: unsigned-exe
           retention-days: 1
           path: |
-            Release64\Ditto.exe
+            Release64\Ditonn.exe
             Release64\ICU_Loader.dll
             Release64\Addins\DittoUtil.dll
             

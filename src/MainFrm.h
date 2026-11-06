@@ -114,8 +114,6 @@ protected:
 	void ShowQPasteWithActiveWindowCheck();
     afx_msg LRESULT OnShowTrayIcon(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnClipboardCopied(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnAddToDatabaseFromSocket(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnErrorOnSendRecieve(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnErrorMsg(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnEditWndClose(WPARAM wParam, LPARAM lParam);
     afx_msg LRESULT OnSetConnected(WPARAM wParam, LPARAM lParam);
