@@ -5,6 +5,72 @@
 #include "Misc.h"
 #include "cp_main.h"
 
+CMainFrmThread::CMainFrmThread(void)
+{
+	m_threadName = "CMainFrmThread";
+    for(int eventEnum = 0; eventEnum < ECMAINFRMTHREADEVENTS_COUNT; eventEnum++)
+    {
+        AddEvent(eventEnum);
+    }
+}
+
+CMainFrmThread::~CMainFrmThread(void)
+{
+
+}
+
+void CMainFrmThread::AddClipToSave(CClip *pClip)
+{
+	ATL::CCritSecLock csLock(m_cs.m_sect);
+
+	Log(_T("Adding clip to thread for save to db"));
+	m_saveClips.AddTail(pClip);
+	FireEvent(SAVE_CLIPS);
+}
+
+void CMainFrmThread::OnEvent(int eventId, void *param)
+{
+    switch((eCMainFrmThreadEvents)eventId)
+    {
+        case DELETE_ENTRIES:
+            OnDeleteEntries();
+            break;
+        case REMOVE_TEMP_FILES:
+            OnRemoveTempFiles();
+            break;
+		case SAVE_CLIPS:
+			OnSaveClips();
+			break;
+		case READ_DB_FILE:
+			OnReadDbFile();
+			break;
+    }
+}
+
+//try and keep our db file in windows cache by randomly reading some data
+//not sure if this does what i think it does but looking into issues with slow access on large dbs
+void CMainFrmThread::OnReadDbFile()
+{
+	double idle = IdleSeconds();
+
+	if (idle < CGetSetOptions::ReadRandomFileIdleMin())
+	{
+		CString dbFile = CGetSetOptions::GetDBPath();
+		__int64 dbSize = FileSize(dbFile);
+
+		srand((UINT)time(NULL));
+
+		int random = rand() % (dbSize - 1024) + 1;
+
+		CFile f;
+		if (f.Open(dbFile, CFile::modeRead | CFile::shareDenyNone))
+		{
+			f.Seek(random, 0);
+			char data[1024];
+			f.Read(&data, 1024);
+
+			f.Close();
+		}
 	}
 }
 

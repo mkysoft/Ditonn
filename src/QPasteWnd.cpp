@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "..\Shared\Tokenizer.h"
+#include "..\Shared\TextConvert.h"
 #include ".\qpastewnd.h"
 #include "ActionEnums.h"
 #include "CF_TextAggregator.h"

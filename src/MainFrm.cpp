@@ -1029,7 +1029,7 @@ LRESULT CMainFrame::OnLoadClipOnClipboard(WPARAM wParam, LPARAM lParam)
 	CClip *pClip = (CClip*)wParam;
     if(pClip == NULL)
     {
-		Log("---------ERROR OnLoadClipOnClipboard pClip == NULL");
+		Log(_T("---------ERROR OnLoadClipOnClipboard pClip == NULL"));
         return FALSE;
     }
 
@@ -1040,12 +1040,12 @@ LRESULT CMainFrame::OnLoadClipOnClipboard(WPARAM wParam, LPARAM lParam)
 		paste.m_bActivateTarget = false;
 		paste.m_pasteOptions.m_delayRenderLockout = GetTickCount();
 
-		Log("---------OnLoadClipOnClipboard - Before PutFormats on clipboard");
+		Log(_T("---------OnLoadClipOnClipboard - Before PutFormats on clipboard"));
 
 		paste.m_pOle->PutFormatOnClipboard(&pClip->m_Formats);
 		paste.m_pOle->CacheGlobalData(theApp.m_cfIgnoreClipboard, NewGlobalP("Ignore", sizeof("Ignore")));
 
-		Log("---------OnLoadClipOnClipboard - After PutFormats on clipboard");
+		Log(_T("---------OnLoadClipOnClipboard - After PutFormats on clipboard"));
 
 		Log(StrF(_T("---------OnLoadClipOnClipboard - Setting clip id: %d on ole clipboard"), pClip->m_id));
 		paste.GetClipIDs().Add(pClip->m_id);

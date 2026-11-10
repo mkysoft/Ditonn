@@ -2485,6 +2485,8 @@ void CGetSetOptions::SetBalloonTimeout(int val)
 	SetProfileLong(_T("BalloonTimeout"), val);
 }
 
+int CGetSetOptions::GetMaxFileContentsSize()
+{
 	return GetProfileLong(_T("MaxFileContentsSize"), 64000000);
 }
 
